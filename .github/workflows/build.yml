@@ -34,7 +34,7 @@ jobs:
               owner: 'jgm',
               repo: 'pandoc'
             });
-            echo "releases tags: $releases.data.map(release => release.tag_name)";
+            console.log("releases tags: ", releases.data.map(release => release.tag_name));
             return releases.data.map(release => release.tag_name);
 
       - name: Find latest release with Docker image
