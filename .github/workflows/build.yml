@@ -74,7 +74,6 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: "${{ env.IMAGE_NAME }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}.${{ steps.parse_version.outputs.revision }}-${{ matrix.os }}"
-          flavor: latest
 
       - name: Set up Docker Buildx
         if: steps.find_latest_release.outputs.latest_release && steps.check_image.outputs.tags == ''
