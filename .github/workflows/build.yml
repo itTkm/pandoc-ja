@@ -39,7 +39,9 @@ jobs:
       - name: Find latest release with Docker image
         id: find_latest_release
         run: |
-          for tag in ${{ steps.check_releases.outputs.result }}; do
+          tags=${{ steps.check_releases.outputs.result }}
+          tags=${tags//[\[\],]/}
+          for tag in $tags; do
             if docker pull pandoc/${{ matrix.variant }}:$tag; then
               echo "::set-output name=latest_release::$tag"
               exit 0
