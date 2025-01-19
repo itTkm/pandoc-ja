@@ -16,10 +16,8 @@ jobs:
 
     strategy:
       matrix:
-        # variant: [latex, extra]
-        # os: [ubuntu, alpine]
-        variant: [extra]
-        os: [ubuntu]
+        variant: [latex, extra]
+        os: [ubuntu, alpine]
 
     steps:
       - name: Checkout repository
