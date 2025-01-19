@@ -79,6 +79,10 @@ jobs:
       #     username: ${{ github.actor }}
       #     password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set image name
+        id: set_image_name
+        run: echo "IMAGE_NAME=$(echo '${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         if: steps.find_latest_release.outputs.latest_release
         uses: docker/build-push-action@v2
@@ -90,9 +94,9 @@ jobs:
             VARIANTS_NAME=${{ matrix.variant }}
             BASE_IMAGE_TAGS=latest-${{ matrix.os }}
           tags: |
-            ${{ env.REGISTRY }}/${ github.repository,, }/${{ matrix.variant }}:latest
-            ${{ env.REGISTRY }}/${ github.repository,, }/${{ matrix.variant }}:latest-${{ matrix.os }}
-            ${{ env.REGISTRY }}/${ github.repository,, }/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}-${{ matrix.os }}
-            ${{ env.REGISTRY }}/${ github.repository,, }/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}-${{ matrix.os }}
-            ${{ env.REGISTRY }}/${ github.repository,, }/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}-${{ matrix.os }}
-            ${{ env.REGISTRY }}/${ github.repository,, }/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}.${{ steps.parse_version.outputs.revision }}-${{ matrix.os }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:latest-${{ matrix.os }}
+            ${{ env.IMAGE_NAME }}:${{ steps.parse_version.outputs.major }}-${{ matrix.os }}
+            ${{ env.IMAGE_NAME }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}-${{ matrix.os }}
+            ${{ env.IMAGE_NAME }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}-${{ matrix.os }}
+            ${{ env.IMAGE_NAME }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}.${{ steps.parse_version.outputs.revision }}-${{ matrix.os }}
