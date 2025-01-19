@@ -89,7 +89,8 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           build-args: |
             VARIANTS_NAME=${{ matrix.variant }}
             BASE_IMAGE_TAG=${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}.${{ steps.parse_version.outputs.revision }}-${{ matrix.os }}
