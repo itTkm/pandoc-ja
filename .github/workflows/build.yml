@@ -43,7 +43,7 @@ jobs:
           tags=$(echo $tags | tr -d '[]"')
           IFS=',' read -r -a tag_array <<< "$tags"
           for tag in "${tag_array[@]}"; do
-            if curl --silent -f -lSL https://hub.docker.com/v2/repositories/pandoc/${{ matrix.variant }}/tags/$tag > /dev/null; then
+            if curl --silent -f -lSL https://hub.docker.com/v2/repositories/pandoc/${{ matrix.variant }}/tags/$tag | jq -e '.name' > /dev/null; then
               echo "::set-output name=latest_release::$tag"
               exit 0
             fi
