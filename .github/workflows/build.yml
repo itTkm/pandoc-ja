@@ -55,11 +55,15 @@ jobs:
         id: parse_version
         run: |
           IFS='.' read -r major minor patch revision <<< "${{ steps.find_latest_release.outputs.latest_release }}"
+          major=${major:-0}
+          minor=${minor:-0}
+          patch=${patch:-0}
+          revision=${revision:-0}
           echo "::set-output name=major::$major"
           echo "::set-output name=minor::$minor"
           echo "::set-output name=patch::$patch"
           echo "::set-output name=revision::$revision"
-          echo "Parsed version: $major.$minor.$patch.$revision"
+          echo "Parsed version: $major.$minor.$.patch.$revision"
 
       # - name: Set up Docker Buildx
       #   if: steps.find_latest_release.outputs.latest_release
