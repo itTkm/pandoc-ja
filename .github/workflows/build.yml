@@ -19,7 +19,7 @@ jobs:
         # variant: [latex, extra]
         # os: [ubuntu, alpine]
         variant: [extra]
-        os: [alpine]
+        os: [ubuntu]
 
     steps:
       - name: Checkout repository
