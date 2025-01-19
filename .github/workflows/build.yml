@@ -41,7 +41,8 @@ jobs:
         run: |
           tags=${{ steps.check_releases.outputs.result }}
           tags=$(echo $tags | tr -d '[]"')
-          for tag in $tags; do
+          IFS=',' read -r -a tag_array <<< "$tags"
+          for tag in "${tag_array[@]}"; do
             if docker pull pandoc/${{ matrix.variant }}:$tag; then
               echo "::set-output name=latest_release::$tag"
               exit 0
