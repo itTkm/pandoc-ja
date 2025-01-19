@@ -1,8 +1,11 @@
 name: Build and Push Docker Image
 
 on:
-  schedule:
-    - cron: "0 0 * * *" # 毎日0時に実行
+  # schedule:
+  #   - cron: "0 0 * * *" # 毎日0時に実行
+  push:
+    branches:
+      - main
 
 env:
   REGISTRY: ghcr.io
