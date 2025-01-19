@@ -34,6 +34,7 @@ jobs:
               owner: 'jgm',
               repo: 'pandoc'
             });
+            echo "releases tags: $releases.data.map(release => release.tag_name)";
             return releases.data.map(release => release.tag_name);
 
       - name: Find latest release with Docker image
@@ -44,6 +45,7 @@ jobs:
           IFS=',' read -r -a tag_array <<< "$tags"
           for tag in "${tag_array[@]}"; do
             if curl --silent -f -lSL https://hub.docker.com/v2/repositories/pandoc/${{ matrix.variant }}/tags/$tag | jq -e '.name' > /dev/null; then
+              echo "Latest release with Docker image: $tag"
               echo "::set-output name=latest_release::$tag"
               exit 0
             fi
