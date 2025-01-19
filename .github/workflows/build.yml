@@ -1,0 +1,86 @@
+name: Build and Push Docker Image
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 毎日0時に実行
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # variant: [latex, extra]
+        # os: [ubuntu, alpine]
+        variant: [extra]
+        os: [alpine]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for new Pandoc releases
+        id: check_releases
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const releases = await github.repos.listReleases({
+              owner: 'jgm',
+              repo: 'pandoc'
+            });
+            return releases.data.map(release => release.tag_name);
+
+      - name: Find latest release with Docker image
+        id: find_latest_release
+        run: |
+          for tag in ${{ steps.check_releases.outputs.result }}; do
+            if docker pull pandoc/${{ matrix.variant }}:$tag; then
+              echo "::set-output name=latest_release::$tag"
+              exit 0
+            fi
+          done
+          echo "No releases have Docker images"
+          exit 1
+
+      - name: Parse version from latest release
+        id: parse_version
+        run: |
+          IFS='.' read -r major minor patch revision <<< "${{ steps.find_latest_release.outputs.latest_release }}"
+          echo "::set-output name=major::$major"
+          echo "::set-output name=minor::$minor"
+          echo "::set-output name=patch::$patch"
+          echo "::set-output name=revision::$revision"
+          echo "Parsed version: $major.$minor.$patch.$revision"
+
+      # - name: Set up Docker Buildx
+      #   if: steps.find_latest_release.outputs.latest_release
+      #   uses: docker/setup-buildx-action@v1
+
+      # # - name: Log in to DockerHub
+      # #   if: steps.find_latest_release.outputs.latest_release
+      # #   uses: docker/login-action@v1
+      # #   with:
+      # #     registry: ${{ env.REGISTRY }}
+      # #     username: ${{ github.actor }}
+      # #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Build and push Docker image
+      #   if: steps.find_latest_release.outputs.latest_release
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     push: false
+      #     platforms: linux/amd64,linux/arm64
+      #     build-args: |
+      #       VARIANTS_NAME=${{ matrix.variant }}
+      #       BASE_IMAGE_TAGS=latest-${{ matrix.os }}
+      #     tags: |
+      #       ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}:latest
+      #       ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}:latest-${{ matrix.os }}
+      #       ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}-${{ matrix.os }}
+      #       ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}-${{ matrix.os }}
+      #       ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}-${{ matrix.os }}
+      #       ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.variant }}:${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.parse_version.outputs.patch }}.${{ steps.parse_version.outputs.revision }}-${{ matrix.os }}
